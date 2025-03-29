@@ -22,6 +22,7 @@ import {
     getInstituteById,
     getAllInstitutes,
     getInstituteDocuments,
+    updateStatus,
     // generatePresignedUrl,
 } from '../controllers/auth-controller.js';
 import authMiddleware from '../middleware/auth-middleware.js';
@@ -80,6 +81,8 @@ authRouter.route("/adjudicator/institutes").get(
     // authMiddleware,
     getAllInstitutes
 )
+
+authRouter.post("/adjudicator/institutes/:instituteId/updateStatus", authMiddleware ,updateStatus)
 
 
 export default authRouter;
