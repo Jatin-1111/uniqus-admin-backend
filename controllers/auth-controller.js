@@ -843,6 +843,65 @@ const logout = async (req, res) => {
     }
 };
 
+// updateStatus
+const updateStatus = async (req, res) => {
+    
+    const instituteId = req.params.instituteId;
+
+    if (!instituteId) {
+        return res.status(400).json({
+            success: false,
+            message: 'Institute ID is required'
+        });
+    }
+
+    const allowedInput = ['Approved', 'Rejected', 'Freezed',]
+
+    try {
+        const institute = await Institute.findById(instituteId);
+        console.log(req.body.status)
+
+        switch (req.body.status){
+            case allowedInput[0] :
+                institute.status = allowedInput[0];
+                break;
+
+            case allowedInput[1] :
+                institute.status = allowedInput[1];
+                break;
+
+            case allowedInput[2] :
+                if (institute.status !== allowedInput[0]) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Invalid Request: Institute must be 'Active' to freeze"
+                    });
+                }
+                institute.status = allowedInput[2];
+                break;   
+
+            default:
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid Input"
+                })
+        }
+
+        await institute.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Staus change successfully"
+        });
+    } catch (error) {
+        console.error("Update Status error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error during Updating Status"
+        });
+    }
+}
+
 export {
     home,
     login,
@@ -855,4 +914,5 @@ export {
     getAssociates,
     saveInstituteDraft,
     submitInstituteApplication,
+    updateStatus,
 };

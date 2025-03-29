@@ -97,7 +97,7 @@ const instituteSchema = new Schema({
     status: {
         type: String,
         required: true,
-        enum: ['Incomplete', 'Pending', 'Active', 'Freezed'],
+        enum: ['Incomplete', 'Pending', 'Approved', 'Freezed', 'Rejected'],
         default: 'Incomplete'
     }
 });
