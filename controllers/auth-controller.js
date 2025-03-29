@@ -51,18 +51,10 @@ const login = async (req, res) => {
         // Generate token for logged in user
         const token = await adjudicator.generateToken();
 
-        // Get only necessary user data to return
-        const userData = {
-            _id: adjudicator._id,
-            email: adjudicator.email
-        };
-
         return res.status(200).json({
             success: true,
             message: "Login Successful",
             token: token,
-            userId: adjudicator._id.toString(),
-            data: userData
         });
     } catch (error) {
         console.log(error);
@@ -384,11 +376,10 @@ const saveInstituteDraft = async (req, res) => {
 //     }
 // };
 
-// POST /api/institutes/:instituteId/documents/metadata
 export const saveDocumentMetadata = async (req, res) => {
     try {
         const { instituteId } = req.params;
-        const { documents } = req.body;
+        const { metadata } = req.body;
 
         // Find the institute
         const institute = await Institute.findById(instituteId);
@@ -399,30 +390,23 @@ export const saveDocumentMetadata = async (req, res) => {
 
         const savedDocuments = [];
 
-        for (const doc of documents) {
-            // Generate access URL with maximum allowed expiry (7 days)
-            const accessUrl = s3.getSignedUrl('getObject', {
-                Bucket: process.env.AWS_S3_BUCKET_NAME,
-                Key: doc.key,
-                Expires: 7 * 24 * 60 * 60 // 7 days (maximum allowed)
-            });
 
-            // Create document record
-            const savedDoc = await InstituteDocument.create({
-                instituteId,
-                fileName: doc.fileName,
-                accessUrl,
-                uploadedAt: new Date()
-            });
+        // Create document record
+        const savedDoc = await InstituteDocument.create({
+            instituteId,
+            fileName: metadata.fileName,
+            accessUrl: metadata.accessUrl,
+            uploadedAt: new Date()
+        });
 
-            // Update institute's documents array
-            if (!institute.documents) {
-                institute.documents = [];
-            }
-            institute.documents.push(savedDoc._id);
-
-            savedDocuments.push(savedDoc);
+        // Update institute's documents array
+        if (!institute.documents) {
+            institute.documents = [];
         }
+        institute.documents.push(savedDoc._id);
+
+        savedDocuments.push(savedDoc);
+
 
         // Save the institute
         await institute.save();

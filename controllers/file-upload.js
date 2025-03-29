@@ -10,10 +10,8 @@ export const s3 = new AWS.S3({
 
 export const generateSignedUrl = async (req, res) => {
 
-    console.log("Bhai log hoja🥹🥹");
-
     const { instituteId } = req.params;
-    const key = `uploads / ${instituteId}/${Date.now()}-${Math.random().toString(36).substring(7)}`;
+    const key = `uploads/${instituteId}/${Date.now()}-${Math.random().toString(36).substring(7)}`;
 
 
     // Define the S3 upload parameters
